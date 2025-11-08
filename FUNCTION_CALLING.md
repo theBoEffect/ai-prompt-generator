@@ -2,37 +2,22 @@
 
 This document explains how Prompt-o-matic uses LLM function calling (tool use) to enable natural, intelligent prompt generation.
 
-## Why Function Calling?
+## Overview
 
-### The Problem with String Parsing
-Traditional approaches rely on fragile string matching:
+Function calling allows the LLM to directly invoke application functions with structured data. When the AI determines it has gathered sufficient information, it calls `generate_final_prompt` with a structured requirements object.
+
+**How it works:**
 ```typescript
-// ❌ Fragile approach
-if (message.includes('COMPLETE:')) {
-  // Generate prompt from Q&A dump
-}
-```
-
-**Issues:**
-- Breaks if LLM says "COMPLETED" instead of "COMPLETE:"
-- No structured data
-- Requires manual parsing of conversation
-- LLM doesn't truly control completion
-
-### Function Calling Solution
-With function calling, the LLM has direct control:
-```typescript
-// ✅ Robust approach
 LLM decides: "I have enough info"
 LLM calls: generate_final_prompt({ purpose: "...", features: [...], ... })
 App receives: Structured, validated data
 ```
 
 **Benefits:**
-- ✅ **Reliable**: Native LLM capability
-- ✅ **Structured**: Type-safe data
-- ✅ **Natural**: LLM truly controls flow
-- ✅ **Flexible**: Works with 3 questions or 10
+- Native LLM capability (reliable)
+- Structured, type-safe data
+- LLM controls conversation flow
+- Adapts to conversation (3-10+ questions)
 
 ## Architecture
 
@@ -233,43 +218,30 @@ Generate structured prompt
 Display final prompt
 ```
 
-## Benefits
+## Key Features
 
-### 1. Natural Conversation
-The LLM truly controls when to complete:
-- Can ask 3 questions if user is detailed
-- Can ask 10 questions if user is vague
-- Adapts to conversation naturally
+### Natural Conversation
+The LLM controls when to complete based on information quality, not a fixed question count.
 
-### 2. Structured Output
-No manual parsing or string manipulation:
+### Structured Output
+Direct access to typed data:
 ```typescript
-// Before: Manual extraction
-const purpose = extractPurposeFromQA(messages);
-
-// After: Direct access
 const purpose = requirements.purpose;
+const features = requirements.features; // string[]
 ```
 
-### 3. Type Safety
+### Type Safety
 TypeScript validates the structure:
 ```typescript
 interface ProjectRequirements {
-  purpose: string;      // ← Type checked
-  features: string[];   // ← Must be array
-  // ...
+  purpose: string;
+  features: string[];
+  // ... all fields type-checked
 }
 ```
 
-### 4. Extensibility
-Easy to add more tools:
-```typescript
-{
-  name: 'ask_clarifying_question',
-  description: 'When user answer is too vague',
-  parameters: { topic: string, question: string }
-}
-```
+### Extensibility
+Additional tools can be added to the tool definition array.
 
 ## Testing Function Calls
 
@@ -328,37 +300,7 @@ console.log('Parsed requirements:', requirements);
 - Ensure all required fields are marked in schema
 - Check LLM is using correct parameter names
 
-## Future Enhancements
-
-### Multiple Tools
-```typescript
-const tools = [
-  { name: 'generate_final_prompt', ... },
-  { name: 'save_draft', ... },
-  { name: 'request_example', ... },
-];
-```
-
-### Tool Chaining
-```typescript
-// LLM can call multiple tools in sequence
-1. ask_clarifying_question
-2. get_user_response
-3. generate_final_prompt
-```
-
-### Streaming Responses
-```typescript
-// Stream tool calls as they're generated
-for await (const chunk of stream) {
-  if (chunk.toolCall) {
-    handleToolCall(chunk.toolCall);
-  }
-}
-```
-
 ## References
 
 - [OpenAI Function Calling](https://platform.openai.com/docs/guides/function-calling)
 - [Anthropic Tool Use](https://docs.anthropic.com/claude/docs/tool-use)
-- [LangChain Tools](https://js.langchain.com/docs/modules/agents/tools/)
