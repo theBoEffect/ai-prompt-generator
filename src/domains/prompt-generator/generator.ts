@@ -65,8 +65,11 @@ TECHNICAL CONSTRAINTS:
 ${requirements.constraints}
 
 IMPLEMENTATION REQUIREMENTS:
-- The application must be functional and ready to use upon completion
-- Follow the architectural separation defined above (security, UI, features, domains, data)
+- The application must be functional and ready to use upon completion with real API calls and data persistence - do not use mock data, simulated responses, or placeholder implementations. 
+- Follow the architectural separation defined above (security, UI, features, domains, data).
+- If the system being designed uses LLM/AI to do any sort of in-system or external CRUD operations, use function calling patterns.
+- Never hardcode API keys, secrets, or credentials in source code. Always use environment variables and keep them server-side.
+- Use parameterized queries or ORM methods to prevent SQL injection. Sanitize all user-generated content to prevent XSS attacks.
 - Include clear documentation for setup and configuration
 - Implement proper error handling and validation
 - Use modern best practices and clean code principles`;
