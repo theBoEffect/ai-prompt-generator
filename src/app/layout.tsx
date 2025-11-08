@@ -4,6 +4,9 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'Prompt-o-matic',
   description: 'AI-powered prompt generator for architecturally sound web applications',
+  icons: {
+    icon: '/favicon.png',
+  },
 }
 
 export default function RootLayout({

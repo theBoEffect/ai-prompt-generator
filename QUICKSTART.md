@@ -5,7 +5,7 @@ Get Prompt-o-matic running in 5 minutes!
 ## Step 1: Install Dependencies
 
 ```bash
-npm install
+yarn install
 ```
 
 ## Step 2: Get an API Key
@@ -49,7 +49,7 @@ ANTHROPIC_API_KEY=sk-ant-your-actual-key-here
 ## Step 4: Run the App
 
 ```bash
-npm run dev
+yarn dev
 ```
 
 ## Step 5: Open in Browser
@@ -68,14 +68,14 @@ That's it! Start chatting with the AI to generate your prompt.
 ### Port 3000 already in use
 ```bash
 # Use a different port
-PORT=3001 npm run dev
+PORT=3001 yarn dev
 ```
 
 ### Build issues
 ```bash
 # Clear Next.js cache
 rm -rf .next
-npm run dev
+yarn dev
 ```
 
 ## What's Next?
