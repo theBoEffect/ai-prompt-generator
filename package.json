@@ -13,6 +13,9 @@
     "react": "19.2.1",
     "react-dom": "19.2.1"
   },
+  "resolutions": {
+    "glob": ">=10.5.0"
+  },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/react": "19",
