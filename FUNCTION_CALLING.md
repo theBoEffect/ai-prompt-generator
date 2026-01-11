@@ -81,9 +81,11 @@ Both OpenAI and Anthropic support tool calling, but with different formats:
 ```typescript
 const response = await fetch('https://api.openai.com/v1/chat/completions', {
   body: JSON.stringify({
-    model: 'gpt-4-turbo-preview',
+    model: 'gpt-5-nano',              // Primary model (falls back to gpt-5-mini)
     messages: messages,
-    tools: TOOL_DEFINITIONS.openai,  // ← Tools enabled
+    verbosity: 'medium',              // GPT-5 parameter: low, medium, high
+    reasoning_effort: 'low',          // GPT-5 parameter: minimal, low, medium, high
+    tools: TOOL_DEFINITIONS.openai,   // ← Tools enabled
     tool_choice: 'auto',              // ← LLM decides when to call
   }),
 });
@@ -281,7 +283,7 @@ console.log('Parsed requirements:', requirements);
 
 **Solutions**:
 - Provide more detailed answers
-- Use a more capable model (GPT-4, Claude 3.5 Sonnet)
+- Use a more capable model (GPT-5-mini, Claude 3.5 Sonnet)
 - Adjust system prompt to be more decisive
 
 ### Parse Error

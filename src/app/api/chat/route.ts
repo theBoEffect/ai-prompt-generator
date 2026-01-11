@@ -5,6 +5,10 @@ const LLM_PROVIDER = process.env.LLM_PROVIDER || 'openai'; // 'openai' or 'anthr
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
+// GPT-5 model configuration
+const OPENAI_MODEL = 'gpt-5-nano';
+const OPENAI_FALLBACK_MODEL = 'gpt-5-mini';
+
 interface Message {
   role: 'user' | 'assistant' | 'system';
   content: string;
@@ -30,7 +34,7 @@ interface LLMResult {
   toolCalls?: ToolCall[];
 }
 
-async function callOpenAI(messages: Message[], temperature: number, maxTokens: number): Promise<LLMResult> {
+async function callOpenAIWithModel(model: string, messages: Message[], maxTokens: number): Promise<LLMResult> {
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -38,10 +42,11 @@ async function callOpenAI(messages: Message[], temperature: number, maxTokens: n
       'Authorization': `Bearer ${OPENAI_API_KEY}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4-turbo-preview',
+      model: model,
       messages: messages,
-      temperature: temperature,
-      max_tokens: maxTokens,
+      max_completion_tokens: maxTokens,
+      verbosity: 'medium',
+      reasoning_effort: 'low',
       tools: TOOL_DEFINITIONS.openai,
       tool_choice: 'auto',
     }),
@@ -66,6 +71,15 @@ async function callOpenAI(messages: Message[], temperature: number, maxTokens: n
       },
     })),
   };
+}
+
+async function callOpenAI(messages: Message[], _temperature: number, maxTokens: number): Promise<LLMResult> {
+  try {
+    return await callOpenAIWithModel(OPENAI_MODEL, messages, maxTokens);
+  } catch (error) {
+    console.warn(`Primary model (${OPENAI_MODEL}) failed, falling back to ${OPENAI_FALLBACK_MODEL}:`, error);
+    return await callOpenAIWithModel(OPENAI_FALLBACK_MODEL, messages, maxTokens);
+  }
 }
 
 async function callAnthropic(messages: Message[], temperature: number, maxTokens: number): Promise<LLMResult> {
